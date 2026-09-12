@@ -2,17 +2,19 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @State private var tasksGroups = TaskGroup.sample
+    @State private var tasksGroups = TaskGroup.sample   // See mock data
 
-    @State private var selectedGroup: TaskGroup?
+    @State private var selectedGroup: TaskGroup?   // Selected group
 
     @State private var columnVisibility:
-        NavigationSplitViewVisibility = .all
+        NavigationSplitViewVisibility = .all  // Navigation side panel
 
+    @State private var isShowingAddGroup = false
+    
     var body: some View {
 
         NavigationSplitView(columnVisibility: $columnVisibility) {
-
+         // SIDEBAR
             List(selection: $selectedGroup) {
 
                 ForEach(tasksGroups) { group in
@@ -29,7 +31,13 @@ struct ContentView: View {
 
             .navigationTitle("ToDo Tracking")
             .listStyle(.sidebar)
-
+            .toolbar {
+                Button {
+                    isShowingAddGroup = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
         } detail: {
 
             if let group = selectedGroup {
@@ -47,8 +55,13 @@ struct ContentView: View {
 
                 ContentUnavailableView(
                     "Select a Group",
-                    systemImage: "sidebar.left"
-                )
+                    systemImage: "sidebar.left")
+            }
+        }
+        .sheet(isPresented: $isShowingAddGroup){
+            NewGroupView { newGroup in
+                tasksGroups.append(newGroup)
+                selectedGroup = newGroup
             }
         }
     }
